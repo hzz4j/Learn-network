@@ -3,28 +3,33 @@ package org.hzz;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.net.Inet4Address;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.io.PrintWriter;
+import java.net.*;
 
 public class ClientDemo {
     public static void main(String[] args) throws IOException {
-        Socket socket = new Socket();
-        socket.connect(new InetSocketAddress(Inet4Address.getLocalHost(), 8380), 3000);
-        System.out.println("客户端: " + socket.getLocalAddress() + ":" + socket.getLocalPort());
-        System.out.println("服务端: " + socket.getInetAddress() + ":" + socket.getPort());
+        try (
+                Socket echoSocket = new Socket(Inet4Address.getLocalHost(),8380);
+                PrintWriter out = new PrintWriter(echoSocket.getOutputStream(),true);
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(echoSocket.getInputStream()));
+                BufferedReader stdIn = new BufferedReader(
+                        new InputStreamReader(System.in));
 
-        // 得到Socket输出流，并转换为打印流
-        BufferedReader socketReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintStream printStream = new PrintStream(socket.getOutputStream());
-        printStream.println("Hello Server");
-        printStream.flush();
-        String msg = socketReader.readLine();
-        System.out.println(msg);
-
-        printStream.close();
-        socketReader.close();
-        socket.close();
+        ) {
+            System.out.println("客户端: " + echoSocket.getLocalAddress() + ":" + echoSocket.getLocalPort());
+            System.out.println("服务端: " + echoSocket.getInetAddress() + ":" + echoSocket.getPort());
+            String userInput;
+            while((userInput = stdIn.readLine()) != null){
+                out.println(userInput);
+                System.out.println("echo "+in.readLine());
+            }
+        }catch (UnknownHostException e) {
+            System.err.println("Don't know about host ");
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("Couldn't get I/O for the connection to ");
+            System.exit(1);
+        }
     }
 }
