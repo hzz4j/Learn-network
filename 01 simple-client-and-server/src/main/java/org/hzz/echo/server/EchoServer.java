@@ -1,4 +1,4 @@
-package org.hzz.server;
+package org.hzz.echo.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -19,6 +19,7 @@ public class EchoServer {
                 System.out.println("监听客户端连接... ...");
                 Socket client = serverSocket.accept();
                 System.out.println("客户端连接："+client.getInetAddress()+":"+client.getPort());
+                System.out.println("客户端连接："+client.getLocalAddress()+":"+client.getLocalPort());
                 new ClientHandler(client).start();
             }
         } catch (IOException e) {

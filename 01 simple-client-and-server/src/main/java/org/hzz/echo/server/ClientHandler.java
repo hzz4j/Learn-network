@@ -1,4 +1,4 @@
-package org.hzz.server;
+package org.hzz.echo.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
